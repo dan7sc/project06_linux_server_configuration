@@ -24,8 +24,7 @@ For this project, we will take a baseline installation of a bare-bones Linux ser
 * The public IP address of the instance is 3.80.185.159.
 * SSH port is 2200
 * URL to hosted web app: www.3.80.185.159.xip.io/ (google login works).
-
-                           http://ec2-3-80-185-159.compute-1.amazonaws.com/ (google login doesn't work).
+* Alternative: http://ec2-3-80-185-159.compute-1.amazonaws.com/ (google login doesn't work).
 
 
 ### 2. Get started on Server
