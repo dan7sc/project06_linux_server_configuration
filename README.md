@@ -21,9 +21,9 @@ For this project, we will take a baseline installation of a bare-bones Linux ser
 
 * Create a publicly accessible Ubuntu Linux server instance using Amazon Lightsail.
 * Configure the Lightsail firewall.
-* The public IP address of the instance is 54.84.114.103.
+* The public IP address of the instance is 3.80.185.159.
 * SSH port is 2200
-* URL to hosted web app: www.54.84.114.103.xip.io/.
+* URL to hosted web app: www.3.80.185.159.xip.io/.
 
 
 ### 2. Get started on Server
@@ -35,7 +35,7 @@ For this project, we will take a baseline installation of a bare-bones Linux ser
   `sudo chmod 644 ~/.ssh/LightsailDefaultKey.pem`
 * Login in the remote server through ssh
 
-  `ssh ubuntu@54.84.114.103 -i ~/.ssh/LightsailDefaultKey.pem`
+  `ssh ubuntu@3.80.185.159 -i ~/.ssh/LightsailDefaultKey.pem`
 
 
 ### 3. Configure SSH
@@ -60,8 +60,6 @@ For this project, we will take a baseline installation of a bare-bones Linux ser
 
   `sudo ufw status`
 
-  `sudo ufw enable`
-
   `sudo ufw default deny incoming`
 
   `sudo ufw default allow outgoing`
@@ -71,6 +69,8 @@ For this project, we will take a baseline installation of a bare-bones Linux ser
   `sudo ufw allow 80/tcp`
 
   `sudo ufw allow 123/udp`
+
+  `sudo ufw enable`
 
 
 ### 5. Add new user
@@ -87,7 +87,7 @@ For this project, we will take a baseline installation of a bare-bones Linux ser
 
   `su -c 'nano /etc/sudoers.d/grader'`
 
-  Change `ubuntu ALL=(ALL) NOPASSWD:ALL` to `grader ALL=(ALL:ALL) ALL`
+  Change `ubuntu ALL=(ALL) NOPASSWD:ALL` to `grader ALL=(ALL) NOPASSWD:ALL`
 
 
 ### 6. Generate public/private rsa key pair
@@ -100,21 +100,22 @@ For this project, we will take a baseline installation of a bare-bones Linux ser
 * Login in the server
 * Create hidden directory `.ssh`
 
-  `mkdir .ssh`
+  `mkdir /home/grader/.ssh`
+* Create the file `authorized_keys`
 
-  `touch .ssh/authorized_keys`
+  `touch /home/grader/.ssh/authorized_keys`
 * Change permissions:
 
   `chmod 700 .ssh`
 
   `chmod 644 .ssh/authorized_keys`
-* Copy `id_rsa_key.pub` content in the local machine to authorized_keys in the server
+* Copy `id_rsa_key.pub` content in the local machine to `authorized_keys` in the server
 * Restart SSH
 
   `sudo service ssh restart`
 * Logout and login entering
 
-  `ssh -p 2200 -i ~/.ssh/id_rsa_key grader@54.84.114.103`
+  `ssh -p 2200 -i ~/.ssh/id_rsa_key grader@3.80.185.159`
 
 
 ### 7. Configure the local timezone to UTC
@@ -158,16 +159,14 @@ For this project, we will take a baseline installation of a bare-bones Linux ser
   `sudo apt-get install postgresql`
 * Set passwd to postgres user
 
-  `sudo passwd postgres`
+  `sudo -u postgres psql`
+
+  Into PostgreSQL shell
+
+      \password postgres
 * Get into PostgreSQL shell with postgres user
 
   `psql -h localhost -U postgres`
-
-* Into PostgreSQL shell
-
-  Alter postgres password
-
-      ALTER USER postgres PASSWORD 'postgres';
 
   Create a user named catalog and set a password
 
@@ -183,9 +182,12 @@ For this project, we will take a baseline installation of a bare-bones Linux ser
 
   Edit the file `/etc/postgresql/9.5/main/pg_hba.conf` changing
 
-      host all all 127.0.0.1/32 md5` to `host catalogdb catalog 127.0.0.1/32 md5
+      host all all 127.0.0.1/32 md5 to host catalogdb catalog 127.0.0.1/32 md5
 
-      host all all ::1/128 md5` to `host catalogdb catalog ::1/128 md5
+      host all all ::1/128 md5 to host catalogdb catalog ::1/128 md5
+* Restart PostegreSQL
+  
+  `sudo systemctl status postgresql`
 
 
 ### 10. Deploy the Item Catalog project
@@ -220,7 +222,7 @@ For this project, we will take a baseline installation of a bare-bones Linux ser
   `sudo cp /etc/fail2ban/fail2ban.conf /etc/fail2ban/fail2ban.local`
 
   `sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local`
-* Configure fail2ban files to block ssh access after unsuccessful login attempts 
+* Configure fail2ban file sto block ssh access after unsuccessful login attempts 
 
   `sudo vi /etc/fail2ban/jail.local`
 
@@ -234,6 +236,13 @@ For this project, we will take a baseline installation of a bare-bones Linux ser
   findtime= 600
   maxretry = 3
   ```
+* Restart fail2ban
+
+  `sudo systemctl restart fail2ban.service`
+
+* Restart fail2ban
+
+  `sudo systemctl restart fail2ban.service`
 
 
 ### 12. Final
@@ -248,4 +257,4 @@ For this project, we will take a baseline installation of a bare-bones Linux ser
   `sudo apache2ctl restart`
 * See the app running on
 
-  www.54.84.114.103.xip.io/
+  www.3.80.185.159.xip.io/
